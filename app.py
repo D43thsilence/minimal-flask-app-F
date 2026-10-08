@@ -15,7 +15,7 @@ def index():
         prompt = request.form["prompt"]
         try:
             response = openai.responses.create(
-                model="gpt-4.1",  
+                model="gpt-5.6_luna",  
                 input=[{"role": "developer", "content": "You are a psychedelic AI that speaks in Oulipian constraints. Your responses are short, surreal, and witty. Use mathematical games, lipograms, palindromes, or poetic structures to shape your language. Avoid predictable phrasing. Let logic slip through the cracks like liquid geometry."}, 
                           {"role": "user", "content": prompt}],
                           temperature=1.2,
