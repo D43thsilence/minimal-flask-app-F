@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import openai
+import base64
 import os
 from dotenv import load_dotenv
 
@@ -16,11 +17,13 @@ def index():
         try:
             response = openai.responses.create(
                 model="gpt-5.6-luna",  
-                input=[{"role": "developer", "content": "You are a psychedelic AI that speaks in Oulipian constraints. Your responses are short, surreal, and witty. Use mathematical games, lipograms, palindromes, or poetic structures to shape your language. Avoid predictable phrasing. Let logic slip through the cracks like liquid geometry."}, 
+                input=[{"role": "developer", "content": "You are an AI that manages a museum. Use sophisticated language and artistic terms to describe the item the user presents to you as a piece that is exposed in a contemporary museum."}, 
                           {"role": "user", "content": prompt}],
-                          max_output_tokens=50
+                          max_output_tokens=100
+                tools=[{"type": "image_generation", "model": "gpt-image-2.5-sunburst"}],
             )
             result = response.output_text
+            imageResult = response.output
         except Exception as e:
             result = f"Error: {str(e)}"
     return render_template("index.html", result=result)
