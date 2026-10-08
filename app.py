@@ -8,6 +8,7 @@ load_dotenv()  # Load environment variables from .env
 
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")  # Securely load API key
+client = OpenAI()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -15,12 +16,11 @@ def index():
     if request.method == "POST":
         prompt = request.form["prompt"]
         try:
-            response = openai.responses.create(
+            response = client.responses.create(
                 model="gpt-5.6-luna",  
-                # input=[{"role": "developer", "content": "You are an AI that manages a museum. Use sophisticated language and artistic terms to describe the item the user presents to you as a piece that is exposed in a contemporary museum."}, 
-                #           {"role": "user", "content": prompt}],
-                #           max_output_tokens=100
-                input= prompt
+                input=[{"role": "developer", "content": "You are an AI that manages a museum. Use sophisticated language and artistic terms to describe the item the user presents to you as a piece that is exposed in a contemporary museum."}, 
+                          {"role": "user", "content": prompt}],
+                          max_output_tokens=100
                 tools=[{"type": "image_generation", "model": "gpt-image-2.5-sunburst"}],
             )
 
