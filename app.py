@@ -77,7 +77,6 @@ def index():
                         "type": "image_generation",
                         "model": "gpt-image-2.5-sunburst",
                         "size": "1024x1024",
-                        "quality": "high",
                     }
                 ],
             )
