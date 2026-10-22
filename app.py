@@ -95,9 +95,7 @@ def index():
                 image_base64 = image_data[0]
 
         except Exception as e:
-            traceback.print_exc()
-    print("ERROR:", str(e))
-    result = f"Error: {str(e)}"
+            result = f"Error: {str(e)}"
 
     return render_template(
         "index.html",
