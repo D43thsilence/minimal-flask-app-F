@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import traceback
 import openai
 import os
 from dotenv import load_dotenv
@@ -94,7 +95,8 @@ def index():
                 image_base64 = image_data[0]
 
         except Exception as e:
-            result = f"Error: {str(e)}"
+            traceback.print_exc()
+    result = f"Error: {str(e)}"
 
     return render_template(
         "index.html",
