@@ -96,6 +96,7 @@ def index():
 
         except Exception as e:
             traceback.print_exc()
+    print("ERROR:", str(e))
     result = f"Error: {str(e)}"
 
     return render_template(
