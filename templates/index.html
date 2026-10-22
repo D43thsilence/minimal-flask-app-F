@@ -60,7 +60,8 @@
         <div class="objectDisplay">
             {% if image %}
             <div>
-                <img src="/image" alt="Generated image">
+                <img src="data:image/png;base64,{{ image }}" alt="Generated image" class="generated-image">
+                <!-- <img src="/image" alt="Generated image"> -->
             </div>
             <!-- {% endif %} -->
 

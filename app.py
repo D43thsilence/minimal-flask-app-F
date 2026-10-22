@@ -92,8 +92,8 @@ def index():
 
             if image_data:
                 image_base64 = image_data[0]
-                with open("output.png", "wb") as f:
-                    f.write(base64.b64decode(image_base64))
+                # with open("output.png", "wb") as f:
+                #     f.write(base64.b64decode(image_base64))
                 
 
         except Exception as e:
@@ -103,6 +103,7 @@ def index():
         "index.html",
         result=result,
         resultDescription=resultDescription,
+        image=image_base64
     )
 
 @app.route("/image")
