@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request
-import traceback
+from flask import Flask, render_template, send_file, request
+import base64
 import openai
 import os
 from dotenv import load_dotenv
@@ -93,6 +93,9 @@ def index():
 
             if image_data:
                 image_base64 = image_data[0]
+                with open("output.png", "wb") as f:
+                    f.write(base64.b64decode(image_base64))
+                
 
         except Exception as e:
             result = f"Error: {str(e)}"
@@ -101,8 +104,11 @@ def index():
         "index.html",
         result=result,
         resultDescription=resultDescription,
-        image=image_base64,
     )
+
+@app.route("/image")
+def image():
+    return send_file("output.png", mimetype="image/png")
 
 
 if __name__ == "__main__":
