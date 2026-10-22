@@ -1,85 +1,100 @@
-# minimal-flask-app
-Minimal code for a Flask app making calls to the OpenAI API.
+# Exhibition Generator
 
-You need Python 3 installed. Run the commands below from inside the project folder.
+A small Flask app that uses the OpenAI API to generate an exhibition tombstone label, a curatorial description, and a museum-display image from one object prompt.
 
+## Entry point
 
-## macOS / Linux
+The application entry point is [`app.py`](app.py). It exposes the Flask application as `app` and defines these routes:
+
+- `GET /` — displays the prompt form.
+- `POST /` — sends the submitted prompt to the OpenAI API and renders the generated label, description, and image.
+- `GET /image` — serves `output.png` if that file is present.
+
+The HTML interface is in [`templates/index.html`](templates/index.html). Flask renders it automatically from the `templates` directory.
+
+## Requirements
+
+- Python 3.10 or newer is recommended.
+- An OpenAI API key with access to the models configured in `app.py`.
+- Network access while the app is generating content.
+
+The app reads `OPENAI_API_KEY` from a `.env` file using `python-dotenv`. Keep this file private; it is already excluded by `.gitignore`.
+
+## Setup and run
+
+Run these commands from the project directory.
+
+### macOS / Linux
 
 ```bash
-# Create virtual environment
-python3 -m venv ./venv
-
-# Activate your virtual environment
+python3 -m venv venv
 source venv/bin/activate
-
-# Install the required packages
-pip3 install flask openai python-dotenv gunicorn
-
-# Rename the file .env-bup to .env
-mv .env-bup .env
-# Then open .env and add your OPENAI_API_KEY
-
-# Run the app
-python3 app.py
+python -m pip install --upgrade pip
+python -m pip install flask openai python-dotenv gunicorn
 ```
 
-## Windows (PowerShell)
+Create `.env` in the project root and add your key:
 
-```powershell
-# Create virtual environment
-python -m venv venv
+```dotenv
+OPENAI_API_KEY=your_api_key_here
+```
 
-# Activate your virtual environment
-.\venv\Scripts\Activate.ps1
+Start the development server:
 
-# Install the required packages
-pip install flask openai python-dotenv gunicorn
-
-# Rename the file .env-bup to .env
-Rename-Item .env-bup .env
-# Then open .env and add your OPENAI_API_KEY
-
-# Run the app
+```bash
 python app.py
 ```
 
-Notes for Windows:
+### Windows PowerShell
 
-- If `python` is not recognised, use `py` instead (for example, `py -m venv venv` and `py app.py`).
-- If PowerShell says that running scripts is disabled, run this once and try the activation again:
-  `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`
-- With Command Prompt (cmd) instead of PowerShell, activate with `venv\Scripts\activate.bat` and rename with `ren .env-bup .env`.
-- `gunicorn` installs on Windows but cannot run there. It is only needed when deploying (for example, on Render), so locally always start the app with `python app.py`.
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install flask openai python-dotenv gunicorn
+```
 
-## Which terminal am I using?
+Create `.env` in the project root and add your key:
 
-Use a **Linux-style shell** if you can: the commands are the same on every platform, which makes it easier to follow tutorials and to get help.
+```dotenv
+OPENAI_API_KEY=your_api_key_here
+```
 
-- **macOS / Linux:** the built-in Terminal already is one. Use the *macOS / Linux* commands below.
-- **Windows, recommended:** install [Git for Windows](https://git-scm.com/download/win), which includes **Git Bash**, or install **WSL** (Windows Subsystem for Linux) by running `wsl --install` in PowerShell. Both give you Linux-style commands.
-  - In **WSL**, use the *macOS / Linux* commands exactly as written.
-  - In **Git Bash**, use the *macOS / Linux* commands, with two changes: use `python` instead of `python3`, and activate with `source venv/Scripts/activate`.
-- **Windows, default:** the terminal in VS Code opens **PowerShell** by default (the prompt starts with `PS C:\...`). If you stay with it, use the *Windows (PowerShell)* commands below.
+Start the development server:
 
-In VS Code, the dropdown next to the `+` in the terminal panel shows which shell is open and lets you pick another one (Git Bash and WSL appear there once installed).
+```powershell
+python app.py
+```
 
-## Check that it works
+If `python` is not available on Windows, replace it with `py`. If PowerShell blocks activation, run this for the current terminal session and activate again:
 
-When the virtual environment is active, `(venv)` appears at the start of your prompt. After `python app.py` (or `python3 app.py`), open <http://127.0.0.1:5000> in your browser.
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+```
 
-VS Code may show a message saying that an environment file is configured but terminal environment injection is disabled (`python.terminal.useEnvFile`). That is fine: the app loads `.env` by itself, so you can ignore the message and leave the setting off.
+## Use the app
 
-## Deploying on Render
+After the server starts, open <http://127.0.0.1:5000> in a browser. Enter a description of an object and select **Generate Exhibition**.
 
-- **Build command:** `pip install flask openai python-dotenv gunicorn`
-- **Start command:** `gunicorn app:app`
-- **Environment variable:** `OPENAI_API_KEY` = your key. Never commit your key to GitHub.
+Stop the development server with `Ctrl+C`. To leave the virtual environment, run:
 
-If the deploy fails with `gunicorn: command not found` (status 127), `gunicorn` is missing from the build command. If it fails with `No module named 'openai'`, `openai` is missing.
+```bash
+deactivate
+```
 
-### If Render times out
+## Troubleshooting
 
-If requests time out (the logs may show `WORKER TIMEOUT`), for example when the OpenAI call is slow, add the `--timeout` parameter to the `gunicorn` line in the Render configuration. gunicorn stops a request after 30 seconds by default, and this raises the limit to 240 seconds:
+- `OPENAI_API_KEY` errors: confirm that `.env` is in the same directory as `app.py`, is named exactly `.env`, and contains a valid key.
+- `ModuleNotFoundError`: activate `venv` and reinstall the packages with `python -m pip install flask openai python-dotenv gunicorn`.
+- The page does not load: confirm that `python app.py` is still running and browse to `http://127.0.0.1:5000`.
+- Generation is slow or fails: the app makes three OpenAI API requests for each submission, so check the terminal output, API access, quota, and network connection.
 
-- **Start command:** `gunicorn app:app --timeout 240`
+## Production deployment
+
+For a platform such as Render:
+
+- Build command: `python -m pip install flask openai python-dotenv gunicorn`
+- Start command: `gunicorn app:app --timeout 240`
+- Environment variable: `OPENAI_API_KEY` set to your API key
+
+Do not commit `.env` or expose your API key in source control. The Flask development server is intended for local development; use Gunicorn or the hosting platform's production server for deployment.
